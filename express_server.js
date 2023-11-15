@@ -25,7 +25,7 @@ app.get("/hello", (req, res) => {
 // new route handler for /url
 app.get("/urls", (req, res) => {
   const templateVars = { urls : urlDatabase };
-  res.render('url_index', templateVars);
+  res.render('urls_index', templateVars);
 });
 
 app.listen(PORT, () => {
