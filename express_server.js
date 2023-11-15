@@ -22,6 +22,12 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// new route handler for /url
+app.get("/urls", (req, res) => {
+  const templateVars = { urls : urlDatabase };
+  res.render('url_index', templateVars);
+});
+
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}!`);
 });
