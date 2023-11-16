@@ -17,7 +17,7 @@ const generateRandomString = () => {
   let result = '';
   for (let i = 0; i < 6; i++) {
     const charactersLength = characters.length;
-    
+
     const randomIndex = Math.floor(Math.random() * charactersLength);
     result += characters.charAt(randomIndex);
   }
@@ -48,8 +48,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const shortenedURL = generateRandomString();
+
+  // create a new shortenedURL key with value of the longURL in urlDataBase
+  urlDatabase[shortenedURL] = req.body.longURL;
+  
+  res.redirect(`http://localhost:8080/urls/:${shortenedURL}`);
 });
 
 // :id is a route parameter that captures the value from the URL
