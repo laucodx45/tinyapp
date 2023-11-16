@@ -53,7 +53,8 @@ app.post("/urls", (req, res) => {
   // create a new shortenedURL key with value of the longURL in urlDataBase
   urlDatabase[shortenedURL] = req.body.longURL;
   
-  res.redirect(`http://localhost:8080/urls/:${shortenedURL}`);
+  res.redirect(`http://localhost:8080/urls/${shortenedURL}`);
+  
 });
 
 // :id is a route parameter that captures the value from the URL
@@ -63,6 +64,11 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
+});
 
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}!`);
