@@ -36,35 +36,36 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-// new route handler for /url
+// route handler for /urls
 app.get("/urls", (req, res) => {
   const templateVars = { urls : urlDatabase };
   res.render('urls_index', templateVars);
 });
 
-// new route to render the submission form
+// route handler for /urls/new, it renders the create new tinyURL submission form
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// handling POST requests to the "/urls" endpoint
 app.post("/urls", (req, res) => {
   const shortenedURL = generateRandomString();
 
-  // create a new shortenedURL key with value of the longURL in urlDataBase
+  // create a new entry in the urlDatabase with the shortenedURL as the key
+  // pair key with longURL, req.body.longURL fetch the longURL user entered
   urlDatabase[shortenedURL] = req.body.longURL;
   
   res.redirect(`http://localhost:8080/urls/${shortenedURL}`);
-  
 });
 
-// :id is a route parameter that captures the value from the URL
+// :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
-  // id is the shortened url, we can fetch longURL by using value of req
+  // req.params.id = shortenedURL
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVars);
 });
 
-
+// route handler for /u/:id, when the shortenedURL is entered into browser, it redirects to the longURL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
