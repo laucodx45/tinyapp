@@ -13,8 +13,6 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-
-
 app.get("/", (req, res) => {
   res.send("Hello");
 });
@@ -45,8 +43,13 @@ app.post("/urls", (req, res) => {
   // create a new entry in the urlDatabase with the shortenedURL as the key
   // pair key with longURL, req.body.longURL fetch the longURL user entered
   urlDatabase[shortenedURL] = req.body.longURL;
-  
-  res.redirect(`http://localhost:8080/urls/${shortenedURL}`);
+  res.redirect(`/urls/${shortenedURL}`);
+});
+
+// handling POST request to delete the shortURL
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
 });
 
 // :id is a route parameter, in this case is the shortURL
