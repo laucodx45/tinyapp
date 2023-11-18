@@ -54,10 +54,11 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // when server receieve a post request /urls/:id/edit, go into urlDatabase to change the longURL
 app.post("/urls/:id/edit", (req, res) => {
-  // we have to get the updated longURL
-  console.log(req.body);
-  res.send('ok got the new longURL');
-})
+  // update the shortURL value from old longURL to the new longURL user submitted through edit
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect("/urls");
+});
+
 // :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
   // req.params.id = shortenedURL
