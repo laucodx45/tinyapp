@@ -29,7 +29,6 @@ app.get("/hello", (req, res) => {
 
 // route handler for /urls
 app.get("/urls", (req, res) => {
-  console.log('req.cookies["username"]', req.cookies['username']);
   const templateVars = {
     username: req.cookies["username"],
     urls : urlDatabase };
