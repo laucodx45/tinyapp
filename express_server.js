@@ -38,7 +38,8 @@ app.get("/urls", (req, res) => {
 
 // route handler for /urls/new, it renders the create new tinyURL submission form
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {username: req.cookies["username"]};
+  res.render("urls_new", templateVars);
 });
 
 // handling POST requests to the "/urls" endpoint
@@ -73,7 +74,11 @@ app.post("/login", (req, res) => {
 // :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
   // req.params.id = shortenedURL
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]};
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"]
+  };
   res.render("urls_show", templateVars);
 });
 
