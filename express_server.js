@@ -52,7 +52,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-// when server receieve a post request /urls/:id/edit, go into urlDatabase to change the longURL
+// when server receieve a post request /urls/:id, go into urlDatabase to change the longURL
 app.post("/urls/:id", (req, res) => {
   // update the shortURL value from old longURL to the new longURL user submitted through edit
   urlDatabase[req.params.id] = req.body.longURL;
