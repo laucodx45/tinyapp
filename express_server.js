@@ -59,6 +59,12 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+// post request to /login
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect("/urls");
+});
+
 // :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
   // req.params.id = shortenedURL
