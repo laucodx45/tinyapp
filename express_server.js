@@ -1,10 +1,12 @@
 const express = require('express');
 const {generateRandomString} = require('./functions');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = 8080;
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
@@ -27,7 +29,10 @@ app.get("/hello", (req, res) => {
 
 // route handler for /urls
 app.get("/urls", (req, res) => {
-  const templateVars = { urls : urlDatabase };
+  console.log('req.cookies["username"]', req.cookies['username']);
+  const templateVars = {
+    username: req.cookies["username"],
+    urls : urlDatabase };
   res.render('urls_index', templateVars);
 });
 
