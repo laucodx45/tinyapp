@@ -41,6 +41,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+// route handler for /register
+app.get("/register", (req, res) => {
+  const templateVars = {username: req.cookies["username"]};
+  res.render("register", templateVars);
+});
+
 // handling POST requests to the "/urls" endpoint
 app.post("/urls", (req, res) => {
   const shortenedURL = generateRandomString();
