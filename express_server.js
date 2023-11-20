@@ -10,10 +10,30 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
+// ----------------------------------------------------------
+// ----------------------------------------------------------
+// Database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = {
+  // userRandomID: {
+  //   id: "userRandomID",
+  //   email: "user@example.com",
+  //   password: "purple-monkey-dinosaur",
+  // },
+  // user2RandomID: {
+  //   id: "user2RandomID",
+  //   email: "user2@example.com",
+  //   password: "dishwasher-funk",
+  // },
+};
+
+// ----------------------------------------------------------
+// ----------------------------------------------------------
+// Route Handlers
 
 app.get("/", (req, res) => {
   res.send("Hello");
@@ -29,22 +49,35 @@ app.get("/hello", (req, res) => {
 
 // route handler for /urls
 app.get("/urls", (req, res) => {
+  // find the specific user using cookies
+  // req.cookies["user_id"] = {id: email: password}
+
+  const templateVarsNew = {
+    user: req.cookies["user_id"],
+    urls: urlDatabase
+  };
+
   const templateVars = {
     username: req.cookies["username"],
-    urls : urlDatabase };
-  res.render('urls_index', templateVars);
+    urls: urlDatabase
+  };
+  res.render('urls_index', templateVarsNew);
 });
 
 // route handler for /urls/new, it renders the create new tinyURL submission form
 app.get("/urls/new", (req, res) => {
   const templateVars = {username: req.cookies["username"]};
-  res.render("urls_new", templateVars);
+
+  const templateVarsNew = {user: req.cookies["user_id"]};
+  res.render("urls_new", templateVarsNew);
 });
 
 // route handler for /register
 app.get("/register", (req, res) => {
   const templateVars = {username: req.cookies["username"]};
-  res.render("register", templateVars);
+  
+  const templateVarsNew = {user: req.cookies["user_id"]};
+  res.render("register", templateVarsNew);
 });
 
 // handling POST requests to the "/urls" endpoint
@@ -77,9 +110,32 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  // res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
+
+// route handler for post request to /register
+app.post("/register", (req, res) => {
+  const randomUserId = generateRandomString();
+  
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+  
+  // create new user object
+  users[randomUserId] = {
+    id: randomUserId,
+    email: userEmail,
+    password: userPassword
+  };
+
+  console.log(users[randomUserId]);
+  // cookies?
+  res.cookie("user_id", users[randomUserId]);
+
+  res.redirect("/urls");
+});
+
 // :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
   // req.params.id = shortenedURL
@@ -87,6 +143,12 @@ app.get("/urls/:id", (req, res) => {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
     username: req.cookies["username"]
+  };
+
+  const templateVarsNew = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    user: req.cookies["user_id"]
   };
   res.render("urls_show", templateVars);
 });
@@ -96,6 +158,8 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
+// ----------------------------------------------------------
+// ----------------------------------------------------------
 
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}!`);
