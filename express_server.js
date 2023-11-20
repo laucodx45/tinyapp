@@ -49,35 +49,34 @@ app.get("/hello", (req, res) => {
 
 // route handler for /urls
 app.get("/urls", (req, res) => {
-  // find the specific user using cookies
-  // req.cookies["user_id"] = {id: email: password}
-
-  const templateVarsNew = {
-    user: req.cookies["user_id"],
-    urls: urlDatabase
-  };
-
+  // find randomId that can be used to access data in users Obj
+  const userId = req.cookies["user_id"];
+  
+  // if cookie does not exist
+  if (!userId) {
+    return res.redirect("/login");
+  }
+  
+  // if cookie exist
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
     urls: urlDatabase
   };
-  res.render('urls_index', templateVarsNew);
+
+  res.render('urls_index', templateVars);
 });
 
 // route handler for /urls/new, it renders the create new tinyURL submission form
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
-
-  const templateVarsNew = {user: req.cookies["user_id"]};
-  res.render("urls_new", templateVarsNew);
+  
+  const templateVars = {user: users[req.cookies["user_id"]]};
+  res.render("urls_new", templateVars);
 });
 
 // route handler for /register
 app.get("/register", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
-  
-  const templateVarsNew = {user: req.cookies["user_id"]};
-  res.render("register", templateVarsNew);
+  const templateVars = {user: users[req.cookies["user_id"]]};
+  res.render("register", templateVars);
 });
 
 // handling POST requests to the "/urls" endpoint
@@ -110,7 +109,6 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  // res.clearCookie("username");
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
@@ -128,11 +126,10 @@ app.post("/register", (req, res) => {
     email: userEmail,
     password: userPassword
   };
+  console.log('users', users);
 
-  console.log(users[randomUserId]);
-  // cookies?
-  res.cookie("user_id", users[randomUserId]);
-
+  // Set a cookie named "user_id" with the value of the user object associated with the randomly generated userID
+  res.cookie("user_id", randomUserId);
   res.redirect("/urls");
 });
 
@@ -142,14 +139,9 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
 
-  const templateVarsNew = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id],
-    user: req.cookies["user_id"]
-  };
   res.render("urls_show", templateVars);
 });
 
