@@ -1,5 +1,6 @@
 const express = require('express');
 const {generateRandomString} = require('./functions');
+const {getUserByEmail} = require('./functions');
 const cookieParser = require('cookie-parser');
 
 const app = express();
@@ -120,6 +121,19 @@ app.post("/register", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   
+  // if email or password is empty send back a statusCode 400
+  if (userEmail.length === 0 || userPassword.length === 0) {
+    res.status(400).send('Bad request, no email or password entered');
+    return;
+  }
+
+  // check users object whether the email has been resgistered
+  if (getUserByEmail(users, userEmail)) {
+    // if function returns true, email has already been registered
+    res.status(400).send('This email has already been registered, try using another email');
+    return;
+  }
+
   // create new user object
   users[randomUserId] = {
     id: randomUserId,
