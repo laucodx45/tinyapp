@@ -13,6 +13,21 @@ const generateRandomString = () => {
   return result;
 };
 
+/**
+ * function look up user's email if user is in database
+ * @param {object} object
+ * @param {string} userId
+ * @returns {string} userID's email, it returns undefined when the userId is not in input object database
+ */
+
+const getUserByEmail = (object, userId) => {
+  if (!object[userId]) {
+    return;
+  }
+  return object[userId].email;
+};
+
 module.exports = {
-  generateRandomString
+  generateRandomString,
+  getUserByEmail
 };
