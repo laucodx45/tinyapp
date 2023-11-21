@@ -12,18 +12,29 @@ const generateRandomString = () => {
   }
   return result;
 };
-
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
 /**
  * function look up user's email if user is in database
  * @param {object} object
  * @param {string} email
- * @returns {boolean} true if email has already been registered, false when the email has not been registered for an account
+ * @returns {boolean} userId if email has already been registered, false when the email has not been registered for an account
  */
 
 const getUserByEmail = (object, email) => {
   for (const user in object) {
     if (object[user].email === email) {
-      return true;
+      return object[user].id;
     }
   }
   return false;
