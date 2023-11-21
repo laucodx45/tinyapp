@@ -55,12 +55,12 @@ app.get("/urls", (req, res) => {
   
   // if cookie does not exist
   if (!userId) {
-    return res.redirect("/login");
+    // return res.redirect("/login");
   }
   
   // if cookie exist
   const templateVars = {
-    user: users[req.cookies["user_id"]],
+    user: users[req.cookies["user_id"]] || null,
     urls: urlDatabase
   };
 
@@ -78,6 +78,12 @@ app.get("/urls/new", (req, res) => {
 app.get("/register", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
   res.render("register", templateVars);
+});
+
+// route handler for get request to /login endpoint
+app.get("/login", (req, res) => {
+  const templateVars = {user: users[req.cookies["user_id"]]};
+  res.render("login", templateVars);
 });
 
 // handling POST requests to the "/urls" endpoint
