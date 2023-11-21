@@ -16,9 +16,12 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class="nav-item nav-link" href="/register">Create User</a>
-        <!-- test -->
         <% if (!user) { %>
+          <a class="nav-item nav-link" href="/register">Register</a>
+          <a class="nav-item nav-link" href="/login">Login</a>
+        <% } %>
+        <!-- test -->
+        <!-- <% if (!user) { %>
           <form action="/login" method="POST">
             <input
               type="text"
@@ -27,12 +30,12 @@
             />
             <button type="submit" class="btn btn-primary">Login</button>
           </form>
-        <% } else { %>
+        <% } else { %> -->
             <a class="navbar-brand">Logged in as: <%= user.email %>!</a>
-          <form action="/logout" method="POST">
-            <button type="submit" class="btn-secondary">Logout</button>
-          </form>
-        <% } %>
+        <form action="/logout" method="POST">
+          <button type="submit" class="btn-secondary">Logout</button>
+        </form>
+        <!-- <% } %> -->
         <!-- test -->
       </div>
     </div>
