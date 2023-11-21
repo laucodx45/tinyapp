@@ -111,8 +111,28 @@ app.post("/urls/:id", (req, res) => {
 
 // post request to /login
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
+  // req.body = {email: exampleEmail, password: examplePw}
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+
+  // if email or password is empty send back a statusCode 400
+  if (userEmail.length === 0 || userPassword.length === 0) {
+    res.status(400).send('Bad request, no email or password entered');
+    return;
+  }
+  // if email entered in login is in users database
+  if (getUserByEmail(users, userEmail)) {
+    const id = getUserByEmail(users, userEmail);
+
+    // check whether pw in users obj match with the one user used to login
+    if (users[id].password === userPassword) {
+      res.cookie("user_id", id);
+      res.redirect("/urls");
+      return;
+    }
+  }
+  // if email is not in database or password does not match the one in database
+  res.status(403).send('email not in database, or password does not match');
 });
 
 app.post("/logout", (req, res) => {
@@ -133,10 +153,10 @@ app.post("/register", (req, res) => {
     return;
   }
 
-  // check users object whether the email has been resgistered
+  // check users object whether the email has been resgistered, if truthy
   if (getUserByEmail(users, userEmail)) {
     // if function returns true, email has already been registered
-    res.status(400).send('This email has already been registered, try using another email');
+    res.status(400).send(`${getUserByEmail(users, userEmail)} email has already been registered, try using another email`);
     return;
   }
 
