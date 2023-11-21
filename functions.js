@@ -16,15 +16,17 @@ const generateRandomString = () => {
 /**
  * function look up user's email if user is in database
  * @param {object} object
- * @param {string} userId
- * @returns {string} userID's email, it returns undefined when the userId is not in input object database
+ * @param {string} email
+ * @returns {boolean} true if email has already been registered, false when the email has not been registered for an account
  */
 
-const getUserByEmail = (object, userId) => {
-  if (!object[userId]) {
-    return;
+const getUserByEmail = (object, email) => {
+  for (const user in object) {
+    if (object[user].email === email) {
+      return true;
+    }
   }
-  return object[userId].email;
+  return false;
 };
 
 module.exports = {
