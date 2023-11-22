@@ -43,7 +43,7 @@ app.get("/urls", (req, res) => {
   
   // if cookie exist
   const templateVars = {
-    user: users[req.cookies["user_id"]] || null,
+    user: users[userId] || null,
     urls: urlDatabase
   };
 
