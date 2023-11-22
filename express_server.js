@@ -3,7 +3,9 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const {generateRandomString} = require('./functions');
 const {getUserByEmail} = require('./functions');
-
+// Bug
+// if user doesn't log out, it mess with the site**
+// user have access to the shortenedURL that they did not create
 const app = express();
 const PORT = 8080;
 
@@ -22,6 +24,18 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+/*
+const urlDatabase = {
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
+};
+*/
 const users = {};
 
 // ----------------------------------------------------------
@@ -91,6 +105,7 @@ app.get("/login", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const userId = req.cookies["user_id"];
+  const longURL = req.body.longURL;
 
   // if user is not logged in, POST /urls should respond with an HTML message
   if (!userId) {
@@ -103,7 +118,8 @@ app.post("/urls", (req, res) => {
 
   // create a new entry in the urlDatabase with the shortenedURL as the key
   // pair key with longURL, req.body.longURL fetch the longURL user entered
-  urlDatabase[shortenedURL] = req.body.longURL;
+  urlDatabase[shortenedURL] = { userID: userId, longURL: longURL};
+  console.log(urlDatabase[shortenedURL]); //debug console.log
   res.redirect(`/urls/${shortenedURL}`);
 });
 
@@ -115,9 +131,16 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // post request to /urls/:id, request to change the longURL in urlDatabase
 app.post("/urls/:id", (req, res) => {
-  // update the shortURL value from old longURL to the new longURL user submitted through edit
-  urlDatabase[req.params.id] = req.body.longURL;
-  res.redirect("/urls");
+  const userId = req.cookies["user_id"];
+
+  if (urlDatabase[req.params.id].userID === userId) {
+    // update the shortURL value from old longURL to the new longURL user submitted through edit
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+    res.redirect("/urls");
+    return;
+  }
+  
+  res.status(403).send('Forbidden: userID of this shortURL does not match with current user.');
 });
 
 app.post("/login", (req, res) => {
@@ -187,7 +210,7 @@ app.get("/urls/:id", (req, res) => {
   // req.params.id = shortenedURL
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[req.cookies["user_id"]]
   };
 
@@ -210,7 +233,7 @@ app.get("/u/:id", (req, res) => {
     return;
   }
 
-  const longURL = urlDatabase[shortenedURL];
+  const longURL = urlDatabase[shortenedURL].longURL;
   res.redirect(longURL);
 });
 // ----------------------------------------------------------
