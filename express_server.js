@@ -56,7 +56,15 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = {user: users[req.cookies["user_id"]]};
+  const userId = req.cookies["user_id"];
+
+  // if user is logged in, GET /register should redirect to GET /urls
+  if (userId) {
+    res.redirect("/urls");
+    return;
+  }
+  
+  const templateVars = {user: users[userId]};
   res.render("register", templateVars);
 });
 
