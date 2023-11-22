@@ -98,7 +98,7 @@ app.post("/urls", (req, res) => {
     res.send(htmlMessage);
     return;
   }
-  
+
   const shortenedURL = generateRandomString();
 
   // create a new entry in the urlDatabase with the shortenedURL as the key
@@ -196,7 +196,21 @@ app.get("/urls/:id", (req, res) => {
 
 // route handler for /u/:id, when the shortenedURL is entered into browser, it redirects user to the longURL
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const shortenedURL = req.params.id;
+
+  // if the id does not exist at GET /u/:id
+
+  // have to go into urlDatabase to check if the shortendURL exist
+  const doesIdExist = urlDatabase[shortenedURL];
+
+  if (!doesIdExist) {
+    // Implement a relevant HTML error message
+    const errorHtmlMessage = '<html><body><h1>Error, the shortenedURL does not exist in our dataBase</h1></body></html>';
+    res.send(errorHtmlMessage);
+    return;
+  }
+
+  const longURL = urlDatabase[shortenedURL];
   res.redirect(longURL);
 });
 // ----------------------------------------------------------
