@@ -51,7 +51,15 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {user: users[req.cookies["user_id"]]};
+  const userId = req.cookies["user_id"];
+
+  // If the user is not logged in, redirect GET /urls/new to GET /login
+  if (!userId) {
+    res.redirect("/login");
+    return;
+  }
+  
+  const templateVars = {user: users[userId]};
   res.render("urls_new", templateVars);
 });
 
@@ -63,7 +71,7 @@ app.get("/register", (req, res) => {
     res.redirect("/urls");
     return;
   }
-  
+
   const templateVars = {user: users[userId]};
   res.render("register", templateVars);
 });
