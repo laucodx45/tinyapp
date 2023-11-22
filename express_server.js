@@ -1,7 +1,8 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
 const {generateRandomString} = require('./functions');
 const {getUserByEmail} = require('./functions');
-const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = 8080;
@@ -9,7 +10,7 @@ const PORT = 8080;
 // middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-// add morgan
+app.use(morgan('dev'));
 
 app.set("view engine", "ejs");
 
