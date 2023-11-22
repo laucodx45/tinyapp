@@ -58,7 +58,7 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
     return;
   }
-  
+
   const templateVars = {user: users[userId]};
   res.render("urls_new", templateVars);
 });
@@ -90,6 +90,15 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  const userId = req.cookies["user_id"];
+
+  // if user is not logged in, POST /urls should respond with an HTML message
+  if (!userId) {
+    const htmlMessage = '<html><body><h1>Cannot shorten URL, user must login to use this feature</h1></body></html>';
+    res.send(htmlMessage);
+    return;
+  }
+  
   const shortenedURL = generateRandomString();
 
   // create a new entry in the urlDatabase with the shortenedURL as the key
