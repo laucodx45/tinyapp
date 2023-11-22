@@ -19,13 +19,12 @@
         <% if (!user) { %>
           <a class="nav-item nav-link" href="/register">Register</a>
           <a class="nav-item nav-link" href="/login">Login</a>
+        <% } else { %>
+          <a class="navbar-brand">Logged in as: <%= user.email %>!</a>
+          <form action="/logout" method="POST">
+            <button type="submit" class="btn-secondary">Logout</button>
+          </form>
         <% } %>
-        <a class="navbar-brand">Logged in as: <%= user.email %>!</a>
-        <form action="/logout" method="POST">
-          <button type="submit" class="btn-secondary">Logout</button>
-        </form>
-        <!-- <% } %> -->
-        <!-- test -->
       </div>
     </div>
   </nav>
