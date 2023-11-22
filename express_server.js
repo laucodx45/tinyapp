@@ -6,8 +6,10 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080;
 
+// middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// add morgan
 
 app.set("view engine", "ejs");
 
@@ -137,7 +139,7 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // route handler for post request to /register
