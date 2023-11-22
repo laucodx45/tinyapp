@@ -57,7 +57,7 @@ app.get("/urls", (req, res) => {
   
   // if cookie does not exist
   if (!userId) {
-    // return res.redirect("/login");
+    return res.redirect("/login");
   }
   
   // if cookie exist
@@ -158,7 +158,7 @@ app.post("/register", (req, res) => {
   // check users object whether the email has been resgistered, if truthy
   if (getUserByEmail(users, userEmail)) {
     // if function returns true, email has already been registered
-    res.status(400).send(`${getUserByEmail(users, userEmail)} email has already been registered, try using another email`);
+    res.status(400).send(`This email has already been registered, try registering with another email`);
     return;
   }
 
@@ -168,7 +168,6 @@ app.post("/register", (req, res) => {
     email: userEmail,
     password: userPassword
   };
-  console.log('users', users);
 
   // Set a cookie named "user_id" with the value of the user object associated with the randomly generated userID
   res.cookie("user_id", randomUserId);
