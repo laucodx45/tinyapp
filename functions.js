@@ -15,15 +15,15 @@ const generateRandomString = () => {
 
 /**
  * function look up user's email if user is in database
- * @param {object} object
+ * @param {object} database
  * @param {string} email
  * @returns {boolean} userId if email has already been registered, false when the email has not been registered for an account
  */
 
-const getUserByEmail = (object, email) => {
-  for (const user in object) {
-    if (object[user].email === email) {
-      return object[user].id;
+const getUserByEmail = (database, email) => {
+  for (const user in database) {
+    if (database[user].email === email) {
+      return database[user].id;
     }
   }
   return false;
@@ -49,12 +49,12 @@ const getUserByEmail = (object, email) => {
 //   },
 // };
 
-const urlsForUser = (object, id) => {
+const urlsForUser = (database, id) => {
   const matchURLobj = {};
 
-  for (const shortendURL in object) {
-    if (object[shortendURL].userID === id) {
-      matchURLobj[shortendURL] = object[shortendURL];
+  for (const shortendURL in database) {
+    if (database[shortendURL].userID === id) {
+      matchURLobj[shortendURL] = database[shortendURL];
     }
   }
   // no match, display null
