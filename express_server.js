@@ -247,7 +247,7 @@ app.post("/register", (req, res) => {
   };
 
   // Set a cookie named "user_id" with the value of the user object associated with the randomly generated userID
-  res.cookie("user_id", randomUserId);
+  req.session.user_id = randomUserId;
   res.redirect("/urls");
 });
 
