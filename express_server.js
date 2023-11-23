@@ -6,7 +6,7 @@ const {getUserByEmail} = require('./functions');
 const {urlsForUser} = require('./functions');
 // Bug
 // if user doesn't log out, it mess with the site**
-// how to test post urls/:id/delete for user trying to delete url that they don't own
+
 const app = express();
 const PORT = 8080;
 
@@ -49,10 +49,10 @@ app.get("/urls.json", (req, res) => {
 // route handler for /urls
 app.get("/urls", (req, res) => {
   // find randomId that can be used to access data in users Obj
-  const userId = req.cookies["user_id"];
+  const loggedInUserId = req.cookies["user_id"];
   
   // if user is not logged in
-  if (!userId) {
+  if (!loggedInUserId) {
     // Return HTML with a relevant error message at GET /urls if the user is not logged in.???
     // i thought it should just redrect to login page, should i implement both??
     return res.redirect("/login");
@@ -60,58 +60,58 @@ app.get("/urls", (req, res) => {
   
   // if cookie exist
   const templateVars = {
-    user: users[userId] || null,
-    urls: urlsForUser(urlDatabase, userId)
+    user: users[loggedInUserId] || null,
+    urls: urlsForUser(urlDatabase, loggedInUserId)
   };
 
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const loggedInUserId = req.cookies["user_id"];
 
   // If the user is not logged in, redirect GET /urls/new to GET /login
-  if (!userId) {
+  if (!loggedInUserId) {
     res.redirect("/login");
     return;
   }
 
-  const templateVars = {user: users[userId]};
+  const templateVars = {user: users[loggedInUserId]};
   res.render("urls_new", templateVars);
 });
 
 app.get("/register", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const loggedInUserId = req.cookies["user_id"];
 
   // if user is logged in, GET /register should redirect to GET /urls
-  if (userId) {
+  if (loggedInUserId) {
     res.redirect("/urls");
     return;
   }
 
-  const templateVars = {user: users[userId]};
+  const templateVars = {user: users[loggedInUserId]};
   res.render("register", templateVars);
 });
 
 app.get("/login", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const loggedInUserId = req.cookies["user_id"];
 
   // if user is logged in, GET /login should redirect to GET /urls
-  if (userId) {
+  if (loggedInUserId) {
     res.redirect("/urls");
     return;
   }
 
-  const templateVars = {user: users[userId]};
+  const templateVars = {user: users[loggedInUserId]};
   res.render("login", templateVars);
 });
 
 app.post("/urls", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const loggedInUserId = req.cookies["user_id"];
   const longURL = req.body.longURL;
 
   // if user is not logged in, POST /urls should respond with an HTML message
-  if (!userId) {
+  if (!loggedInUserId) {
     const htmlMessage = '<html><body><h1>Cannot shorten URL, user must login to use this feature</h1></body></html>';
     res.send(htmlMessage);
     return;
@@ -121,29 +121,29 @@ app.post("/urls", (req, res) => {
 
   // create a new entry in the urlDatabase with the shortenedURL as the key
   // pair key with longURL, req.body.longURL fetch the longURL user entered
-  urlDatabase[shortenedURL] = { userID: userId, longURL: longURL};
+  urlDatabase[shortenedURL] = { userID: loggedInUserId, longURL: longURL};
   res.redirect(`/urls/${shortenedURL}`);
 });
 
 // route handler for POST request to delete shortURL
 app.post("/urls/:id/delete", (req, res) => {
-  const userId = req.cookies["user_id"];
-  console.log(userId);
+  const loggedInUserId = req.cookies["user_id"];
+  
   // should return a relevant error message if id does not exist
   if (!urlDatabase[req.params.id]) {
     res.status(404).send("Not Found: url entered is not in urlDatabase");
     return;
   }
   // should return a relevant error message if the user is not logged in
-  if (!userId) {
+  if (!loggedInUserId) {
     res.status(400).send("Bad request: must login to delete URL");
     return;
   }
   // if user have URLS stored in urlDatabase
-  if (urlsForUser(urlDatabase, userId)) {
+  if (urlsForUser(urlDatabase, loggedInUserId)) {
     // check if their Urls match with the one in database
     // currentUser === urlDatabase[id].userID
-    if (urlsForUser(urlDatabase, userId)[req.params.id] === urlDatabase[req.params.id]) {
+    if (urlsForUser(urlDatabase, loggedInUserId)[req.params.id] === urlDatabase[req.params.id]) {
       delete urlDatabase[req.params.id];
       res.redirect("/urls");
       return;
@@ -158,7 +158,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // post request to /urls/:id, request to change the longURL in urlDatabase
 app.post("/urls/:id", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const loggedInUserId = req.cookies["user_id"];
 
   // if id does not exist
   if (urlDatabase[req.params.id] === undefined) {
@@ -167,12 +167,12 @@ app.post("/urls/:id", (req, res) => {
   }
   
   // if user is not logged in
-  if (!userId) {
+  if (!loggedInUserId) {
     res.status(400).send("Bad request: user must login to edit");
     return;
   }
 
-  if (urlDatabase[req.params.id].userID === userId) {
+  if (urlDatabase[req.params.id].userID === loggedInUserId) {
     // update the shortURL value from old longURL to the new longURL user submitted through edit
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect("/urls");
@@ -247,9 +247,9 @@ app.post("/register", (req, res) => {
 // :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
   // req.params.id = shortenedURL
-  const userId = req.cookies["user_id"];
+  const loggedInUserId = req.cookies["user_id"];
 
-  const shortendURLuserOwn = urlsForUser(urlDatabase, userId);
+  const shortendURLuserOwn = urlsForUser(urlDatabase, loggedInUserId);
 
   // shortenURLuserOwn holds the shortendURL in urlDatabase that the userId owns
   // null = they don't own any URLS, no null = they own some but we'll check if they own :id
@@ -261,7 +261,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: shortendURLuserOwn[req.params.id].longURL,
-    user: users[userId]
+    user: users[loggedInUserId]
   };
 
   res.render("urls_show", templateVars);
