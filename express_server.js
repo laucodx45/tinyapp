@@ -1,5 +1,5 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session')
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
 const {generateRandomString} = require('./functions');
@@ -13,7 +13,7 @@ const PORT = 8080;
 
 // middleware
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession());
 app.use(morgan('dev'));
 
 app.set("view engine", "ejs");
