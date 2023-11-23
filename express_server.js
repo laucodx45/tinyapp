@@ -128,9 +128,9 @@ app.post("/urls", (req, res) => {
 // route handler for POST request to delete shortURL
 app.post("/urls/:id/delete", (req, res) => {
   const loggedInUserId = req.cookies["user_id"];
-  
+  const id = req.params.id;
   // should return a relevant error message if id does not exist
-  if (!urlDatabase[req.params.id]) {
+  if (!urlDatabase[id]) {
     res.status(404).send("Not Found: url entered is not in urlDatabase");
     return;
   }
@@ -139,19 +139,17 @@ app.post("/urls/:id/delete", (req, res) => {
     res.status(400).send("Bad request: must login to delete URL");
     return;
   }
-  // if user have URLS stored in urlDatabase
+  // if user have at least one URL stored in urlDatabase
   if (urlsForUser(urlDatabase, loggedInUserId)) {
-    // check if their Urls match with the one in database
-    // currentUser === urlDatabase[id].userID
-    if (urlsForUser(urlDatabase, loggedInUserId)[req.params.id] === urlDatabase[req.params.id]) {
-      delete urlDatabase[req.params.id];
+    // check if the shortendURL from params have userID that matches with loggedInUser, if it matches, user can delete url
+    if (loggedInUserId === urlDatabase[id].userID) {
+      delete urlDatabase[id];
       res.redirect("/urls");
       return;
     }
-    // HOW TO TEST THIS ONE?
-    // should return a relevant error message if the user does not own the URL
-    
   }
+  // user either have no URL stored or have url stored but they don't own it
+  // we will return 403 at this point, they don't own that URL then
   res.status(403).send("Forbidden: user does not own the URL");
   return;
 });
