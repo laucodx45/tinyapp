@@ -6,7 +6,7 @@ const {getUserByEmail} = require('./functions');
 const {urlsForUser} = require('./functions');
 // Bug
 // if user doesn't log out, it mess with the site**
-// user have access to the shortenedURL that they did not create
+// how to test post urls/:id/delete for user trying to delete url that they don't own
 const app = express();
 const PORT = 8080;
 
@@ -127,8 +127,31 @@ app.post("/urls", (req, res) => {
 
 // route handler for POST request to delete shortURL
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect("/urls");
+  const userId = req.cookies["user_id"];
+  // should return a relevant error message if id does not exist
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send("Not Found: url entered is not in urlDatabase");
+    return;
+  }
+  // should return a relevant error message if the user is not logged in
+  if (!userId) {
+    res.status(400).send("Bad request: must login to delete URL");
+    return;
+  }
+  // if user have URLS stored in urlDatabase
+  if (urlsForUser(urlDatabase, userId)) {
+    // check if their Urls match with the one in database
+    if (urlsForUser(urlDatabase, userId)[req.params.id] === urlDatabase[req.params.id]) {
+      delete urlDatabase[req.params.id];
+      res.redirect("/urls");
+      return;
+    }
+    // HOW TO TEST THIS ONE?
+    // should return a relevant error message if the user does not own the URL
+    res.status(403).send("Forbidden: user does not own the URL");
+    return;
+  }
+  
 });
 
 // post request to /urls/:id, request to change the longURL in urlDatabase
