@@ -122,7 +122,6 @@ app.post("/urls", (req, res) => {
   // create a new entry in the urlDatabase with the shortenedURL as the key
   // pair key with longURL, req.body.longURL fetch the longURL user entered
   urlDatabase[shortenedURL] = { userID: userId, longURL: longURL};
-  console.log(urlDatabase[shortenedURL]); //debug console.log
   res.redirect(`/urls/${shortenedURL}`);
 });
 
@@ -136,14 +135,26 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const userId = req.cookies["user_id"];
 
+  // if id does not exist
+  if (urlDatabase[req.params.id] === undefined) {
+    res.status(404).send("This shortenURL does not exist in urlDatabase");
+    return;
+  }
+  
+  // if user is not logged in
+  if (!userId) {
+    res.status(400).send("Bad request: user must login to edit");
+    return;
+  }
+
   if (urlDatabase[req.params.id].userID === userId) {
     // update the shortURL value from old longURL to the new longURL user submitted through edit
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect("/urls");
     return;
   }
-  
-  res.status(403).send('Forbidden: userID of this shortURL does not match with current user.');
+
+  res.status(403).send('Forbidden: user do not own this shortendURL');
 });
 
 app.post("/login", (req, res) => {
