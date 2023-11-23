@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const {generateRandomString} = require('./functions');
 const {getUserByEmail} = require('./functions');
+const {urlsForUser} = require('./functions');
 // Bug
 // if user doesn't log out, it mess with the site**
 // user have access to the shortenedURL that they did not create
@@ -50,15 +51,17 @@ app.get("/urls", (req, res) => {
   // find randomId that can be used to access data in users Obj
   const userId = req.cookies["user_id"];
   
-  // if cookie does not exist
+  // if user is not logged in
   if (!userId) {
+    // Return HTML with a relevant error message at GET /urls if the user is not logged in.???
+    // i thought it should just redrect to login page, should i implement both??
     return res.redirect("/login");
   }
   
   // if cookie exist
   const templateVars = {
     user: users[userId] || null,
-    urls: urlDatabase
+    urls: urlsForUser(urlDatabase, userId)
   };
 
   res.render('urls_index', templateVars);
@@ -208,10 +211,21 @@ app.post("/register", (req, res) => {
 // :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
   // req.params.id = shortenedURL
+  const userId = req.cookies["user_id"];
+
+  const shortendURLuserOwn = urlsForUser(urlDatabase, userId);
+
+  // shortenURLuserOwn holds the shortendURL in urlDatabase that the userId owns
+  // null = they don't own any URLS, no null = they own some but we'll check if they own :id
+  if (shortendURLuserOwn === null || shortendURLuserOwn[req.params.id] === undefined) {
+    res.status(401).send("unauthorized access: user do not own this URL");
+    return;
+  }
+
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
-    user: users[req.cookies["user_id"]]
+    longURL: shortendURLuserOwn[req.params.id].longURL,
+    user: users[userId]
   };
 
   res.render("urls_show", templateVars);
