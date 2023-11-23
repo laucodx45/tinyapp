@@ -34,7 +34,7 @@ const getUserByEmail = (object, email) => {
  * function returns the URLs where the userID is equal to the id of the currently logged-in user
  * @param {object} urlDatabase
  * @param {string} user_id from cookie
- * @returns the URLs where the userID is equal to the id of the currently logged-in user
+ * @returns the URLs where the userID is equal to the id of the currently logged-in user, returns null if no URL belongs to logged in user
  */
 
 
