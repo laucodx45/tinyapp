@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const bcrypt = require('bcryptjs');
 const {generateRandomString} = require('./functions');
 const {getUserByEmail} = require('./functions');
 const {urlsForUser} = require('./functions');
@@ -184,7 +185,7 @@ app.post("/login", (req, res) => {
   // req.body = {email: exampleEmail, password: examplePw}
   const userEmail = req.body.email;
   const userPassword = req.body.password;
-
+  
   // if email or password is empty send back a statusCode 400
   if (userEmail.length === 0 || userPassword.length === 0) {
     res.status(400).send('Bad request, both email and password are required to login');
@@ -193,9 +194,9 @@ app.post("/login", (req, res) => {
   // if email entered in login is in users database
   if (getUserByEmail(users, userEmail)) {
     const id = getUserByEmail(users, userEmail);
-
     // check whether password in users obj match with the one user entered to login
-    if (users[id].password === userPassword) {
+    // bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword)
+    if (bcrypt.compareSync(userPassword, users[id].password)) {
       res.cookie("user_id", id);
       res.redirect("/urls");
       return;
@@ -216,7 +217,8 @@ app.post("/register", (req, res) => {
   
   const userEmail = req.body.email;
   const userPassword = req.body.password;
-  
+  const hashedPassword = bcrypt.hashSync(userPassword, 10);
+
   // if email or password is empty send back a statusCode 400
   if (userEmail.length === 0 || userPassword.length === 0) {
     res.status(400).send('Bad Request: Please provide both email and password.');
@@ -234,7 +236,7 @@ app.post("/register", (req, res) => {
   users[randomUserId] = {
     id: randomUserId,
     email: userEmail,
-    password: userPassword
+    password: hashedPassword
   };
 
   // Set a cookie named "user_id" with the value of the user object associated with the randomly generated userID
