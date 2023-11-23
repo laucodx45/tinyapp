@@ -128,6 +128,7 @@ app.post("/urls", (req, res) => {
 // route handler for POST request to delete shortURL
 app.post("/urls/:id/delete", (req, res) => {
   const userId = req.cookies["user_id"];
+  console.log(userId);
   // should return a relevant error message if id does not exist
   if (!urlDatabase[req.params.id]) {
     res.status(404).send("Not Found: url entered is not in urlDatabase");
@@ -141,6 +142,7 @@ app.post("/urls/:id/delete", (req, res) => {
   // if user have URLS stored in urlDatabase
   if (urlsForUser(urlDatabase, userId)) {
     // check if their Urls match with the one in database
+    // currentUser === urlDatabase[id].userID
     if (urlsForUser(urlDatabase, userId)[req.params.id] === urlDatabase[req.params.id]) {
       delete urlDatabase[req.params.id];
       res.redirect("/urls");
@@ -148,10 +150,10 @@ app.post("/urls/:id/delete", (req, res) => {
     }
     // HOW TO TEST THIS ONE?
     // should return a relevant error message if the user does not own the URL
-    res.status(403).send("Forbidden: user does not own the URL");
-    return;
+    
   }
-  
+  res.status(403).send("Forbidden: user does not own the URL");
+  return;
 });
 
 // post request to /urls/:id, request to change the longURL in urlDatabase
