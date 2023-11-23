@@ -1,19 +1,22 @@
 const express = require('express');
-const cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
-const {generateRandomString} = require('./functions');
-const {getUserByEmail} = require('./functions');
-const {urlsForUser} = require('./functions');
+const {generateRandomString, getUserByEmail, urlsForUser} = require('./functions');
 // Bug
-// if user doesn't log out, it mess with the site**
+// if user doesn't log out, it mess with the site** FIxed with session
 
 const app = express();
 const PORT = 8080;
 
 // middleware
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieSession());
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ['cookie']
+}));
+
 app.use(morgan('dev'));
 
 app.set("view engine", "ejs");
@@ -54,7 +57,7 @@ app.get("/urls.json", (req, res) => {
 // route handler for /urls
 app.get("/urls", (req, res) => {
   // find randomId that can be used to access data in users Obj
-  const loggedInUserId = req.cookies["user_id"];
+  const loggedInUserId = req.session.user_id;
   
   // if user is not logged in
   if (!loggedInUserId) {
@@ -73,7 +76,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const loggedInUserId = req.cookies["user_id"];
+  const loggedInUserId = req.session.user_id;
 
   // If the user is not logged in, redirect GET /urls/new to GET /login
   if (!loggedInUserId) {
@@ -86,7 +89,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const loggedInUserId = req.cookies["user_id"];
+  const loggedInUserId = req.session.user_id;
 
   // if user is logged in, GET /register should redirect to GET /urls
   if (loggedInUserId) {
@@ -99,7 +102,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const loggedInUserId = req.cookies["user_id"];
+  const loggedInUserId = req.session.user_id;
 
   // if user is logged in, GET /login should redirect to GET /urls
   if (loggedInUserId) {
@@ -112,7 +115,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const loggedInUserId = req.cookies["user_id"];
+  const loggedInUserId = req.session.user_id;
   const longURL = req.body.longURL;
 
   // if user is not logged in, POST /urls should respond with an HTML message
@@ -132,7 +135,7 @@ app.post("/urls", (req, res) => {
 
 // route handler for POST request to delete shortURL
 app.post("/urls/:id/delete", (req, res) => {
-  const loggedInUserId = req.cookies["user_id"];
+  const loggedInUserId = req.session.user_id;
   const id = req.params.id;
   // should return a relevant error message if id does not exist
   if (!urlDatabase[id]) {
@@ -161,7 +164,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // post request to /urls/:id, request to change the longURL in urlDatabase
 app.post("/urls/:id", (req, res) => {
-  const loggedInUserId = req.cookies["user_id"];
+  const loggedInUserId = req.session.user_id;
 
   // if id does not exist
   if (urlDatabase[req.params.id] === undefined) {
@@ -201,7 +204,7 @@ app.post("/login", (req, res) => {
     // check whether password in users obj match with the one user entered to login
     // bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword)
     if (bcrypt.compareSync(userPassword, users[id].password)) {
-      res.cookie("user_id", id);
+      req.session.user_id = id;
       res.redirect("/urls");
       return;
     }
@@ -211,7 +214,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/login");
 });
 
@@ -251,7 +254,7 @@ app.post("/register", (req, res) => {
 // :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
   // req.params.id = shortenedURL
-  const loggedInUserId = req.cookies["user_id"];
+  const loggedInUserId = req.session.user_id;
 
   const shortendURLuserOwn = urlsForUser(urlDatabase, loggedInUserId);
 
