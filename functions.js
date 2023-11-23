@@ -29,7 +29,44 @@ const getUserByEmail = (object, email) => {
   return false;
 };
 
+// urlsForUser(id) which returns the URLs where the userID is equal to the id of the currently logged-in user
+/**
+ * function returns the URLs where the userID is equal to the id of the currently logged-in user
+ * @param {object} urlDatabase
+ * @param {string} user_id from cookie
+ * @returns the URLs where the userID is equal to the id of the currently logged-in user
+ */
+
+
+// const urlDatabase = {
+//   b6UTxQ: {
+//     longURL: "https://www.tsn.ca",
+//     userID: "aJ48lW",
+//   },
+//   i3BoGr: {
+//     longURL: "https://www.google.ca",
+//     userID: "aJ48lW",
+//   },
+// };
+
+const urlsForUser = (object, id) => {
+  const matchURLobj = {};
+  for (const shortendURL in object) {
+    if (object[shortendURL].userID === id) {
+      matchURLobj[shortendURL] = object[shortendURL];
+    }
+  }
+  // no match, display null
+  if (Object.keys(matchURLobj).length === 0) {
+    return null;
+  }
+
+  return matchURLobj;
+};
+
+// console.log(urlsForUser(urlDatabase, "J48lW"));
 module.exports = {
   generateRandomString,
-  getUserByEmail
+  getUserByEmail,
+  urlsForUser
 };
