@@ -17,7 +17,7 @@ const generateRandomString = () => {
  * function look up user's email if user is in database
  * @param {object} database
  * @param {string} email
- * @returns {boolean} userId if email has already been registered, false when the email has not been registered for an account
+ * @returns {boolean} userId if email has already been registered, undefined when the email has not been registered for an account
  */
 
 const getUserByEmail = (database, email) => {
