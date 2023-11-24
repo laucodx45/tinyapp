@@ -3,9 +3,9 @@ const {generateRandomString} = require('../functions');
 
 describe("#generateRandomString", () => {
 
-  it("should return a random alphanumeric string that contain 6 characters", () => {
-    const otuputLength = generateRandomString().length;
-    assert.strictEqual(otuputLength, 6);
+  it("should returns a random alphanumeric string that contain 6 characters", () => {
+    const outputLength = generateRandomString().length;
+    assert.strictEqual(outputLength, 6);
   });
-  
+
 });
