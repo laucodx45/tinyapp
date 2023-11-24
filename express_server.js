@@ -3,13 +3,16 @@ const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
 const {generateRandomString, getUserByEmail, urlsForUser} = require('./functions');
-// Bug
-// if user doesn't log out, it mess with the site** FIxed with session
 
 const app = express();
 const PORT = 8080;
 
-// middleware
+// ///////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////
+// Middleware
+// ///////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieSession({
@@ -26,23 +29,8 @@ app.set("view engine", "ejs");
 // Database
 // ///////////////////////////////////////////////////////////////////////////
 // ///////////////////////////////////////////////////////////////////////////
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
 
-/*
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-};
-*/
+const urlDatabase = {};
 const users = {};
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -50,6 +38,7 @@ const users = {};
 // Route Handlers
 // ///////////////////////////////////////////////////////////////////////////
 // ///////////////////////////////////////////////////////////////////////////
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -234,7 +223,7 @@ app.post("/register", (req, res) => {
 
   // check users object whether the email has been resgistered, if truthy
   if (getUserByEmail(users, userEmail)) {
-    // if function returns true, email has already been registered
+    // if function returns a truthy value, email has already been registered
     res.status(400).send(`This email has already been registered. Please use a different email`);
     return;
   }
