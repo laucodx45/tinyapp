@@ -26,7 +26,7 @@ const getUserByEmail = (database, email) => {
       return database[user].id;
     }
   }
-  return false;
+  return undefined;
 };
 
 // urlsForUser(id) which returns the URLs where the userID is equal to the id of the currently logged-in user
@@ -36,18 +36,6 @@ const getUserByEmail = (database, email) => {
  * @param {string} user_id from cookie
  * @returns the URLs where the userID is equal to the id of the currently logged-in user, returns null if no URL belongs to logged in user
  */
-
-
-// const urlDatabase = {
-//   b6UTxQ: {
-//     longURL: "https://www.tsn.ca",
-//     userID: "aJ48lW",
-//   },
-//   i3BoGr: {
-//     longURL: "https://www.google.ca",
-//     userID: "aJ48lW",
-//   },
-// };
 
 const urlsForUser = (database, id) => {
   const matchURLobj = {};
