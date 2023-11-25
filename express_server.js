@@ -75,7 +75,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const loggedInUserId = req.session.user_id;
 
-  // If the user is not logged in, redirect GET /urls/new to GET /login
+  // If the user is not logged in, redirect to GET /login
   if (!loggedInUserId) {
     res.redirect("/login");
     return;
@@ -130,7 +130,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortenedURL}`);
 });
 
-// route handler for POST request to delete shortURL
+// POST request to delete shortURL
 app.post("/urls/:id/delete", (req, res) => {
   const loggedInUserId = req.session.user_id;
   const id = req.params.id;
@@ -159,7 +159,7 @@ app.post("/urls/:id/delete", (req, res) => {
   return;
 });
 
-// post request to /urls/:id, request to change the longURL in urlDatabase
+// post request to change the longURL in urlDatabase
 app.post("/urls/:id", (req, res) => {
   const loggedInUserId = req.session.user_id;
 
@@ -215,7 +215,6 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 });
 
-// post request to /register endpoint
 app.post("/register", (req, res) => {
   const randomUserId = generateRandomString();
   
@@ -248,23 +247,34 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-// :id is a route parameter, in this case is the shortURL
 app.get("/urls/:id", (req, res) => {
-  // req.params.id = shortenedURL
+  const shortenURL = req.params.id;
   const loggedInUserId = req.session.user_id;
 
+  // if user is not logged in
+  if (!loggedInUserId) {
+    res.status(401).send("<h3>Unauthorized: user must login first to view this page</h3?");
+    return;
+  }
+
+  // if a URL for the given ID does not exist
+  if (!urlDatabase[shortenURL]) {
+    res.status(404).send("<h3>Not Found: shorten URL cannot be found in database</h3>");
+    return;
+  }
+  
   const shortendURLuserOwn = urlsForUser(urlDatabase, loggedInUserId);
 
   // shortenURLuserOwn holds the shortendURL in urlDatabase that the userId owns
   // null = they don't own any URLS, no null = they own some but we'll check if they own :id
-  if (shortendURLuserOwn === null || shortendURLuserOwn[req.params.id] === undefined) {
+  if (shortendURLuserOwn === null || shortendURLuserOwn[shortenURL] === undefined) {
     res.status(401).send("<h3>unauthorized access: user do not own this URL</h3>");
     return;
   }
 
   const templateVars = {
-    id: req.params.id,
-    longURL: shortendURLuserOwn[req.params.id].longURL,
+    id: shortenURL,
+    longURL: shortendURLuserOwn[shortenURL].longURL,
     user: users[loggedInUserId]
   };
 
