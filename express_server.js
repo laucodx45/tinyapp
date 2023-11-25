@@ -39,6 +39,19 @@ const users = {};
 // ///////////////////////////////////////////////////////////////////////////
 // ///////////////////////////////////////////////////////////////////////////
 
+// get route handler for /
+app.get("/", (req, res) => {
+  const loggedInUserId = req.session.user_id;
+
+  // if user is not logged in
+  if (!loggedInUserId) {
+    res.redirect("/login");
+    return;
+  }
+  // user is logged in
+  res.redirect("/urls");
+});
+
 // route handler for /urls
 app.get("/urls", (req, res) => {
   // find randomId that can be used to access data in users Obj
@@ -46,7 +59,8 @@ app.get("/urls", (req, res) => {
   
   // if user is not logged in
   if (!loggedInUserId) {
-    return res.redirect("/login");
+    res.redirect("/login");
+    return;
   }
   
   // if cookie exist
