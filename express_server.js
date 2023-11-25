@@ -39,10 +39,6 @@ const users = {};
 // ///////////////////////////////////////////////////////////////////////////
 // ///////////////////////////////////////////////////////////////////////////
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
 // route handler for /urls
 app.get("/urls", (req, res) => {
   // find randomId that can be used to access data in users Obj
@@ -50,14 +46,12 @@ app.get("/urls", (req, res) => {
   
   // if user is not logged in
   if (!loggedInUserId) {
-    // Return HTML with a relevant error message at GET /urls if the user is not logged in.???
-    // i thought it should just redrect to login page, should i implement both??
     return res.redirect("/login");
   }
   
   // if cookie exist
   const templateVars = {
-    user: users[loggedInUserId] || null,
+    user: users[loggedInUserId],
     urls: urlsForUser(urlDatabase, loggedInUserId)
   };
 
