@@ -109,8 +109,8 @@ app.post("/urls", (req, res) => {
 
   // if user is not logged in, POST /urls should respond with an HTML message
   if (!loggedInUserId) {
-    const htmlMessage = '<html><body><h1>Cannot shorten URL, user must login to use this feature</h1></body></html>';
-    res.send(htmlMessage);
+    const htmlMessage = "<h3>Cannot shorten URL, user must login to use this feature</h3>";
+    res.status(400).send(htmlMessage);
     return;
   }
 
@@ -128,12 +128,12 @@ app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   // should return a relevant error message if id does not exist
   if (!urlDatabase[id]) {
-    res.status(404).send("Not Found: url entered is not in urlDatabase");
+    res.status(404).send("<h3>Not Found: url entered is not in urlDatabase</h3>");
     return;
   }
   // should return a relevant error message if the user is not logged in
   if (!loggedInUserId) {
-    res.status(400).send("Bad request: must login to delete URL");
+    res.status(400).send("<h3>Bad request: must login to delete URL</h3>");
     return;
   }
   // if user have at least one URL stored in urlDatabase
@@ -147,7 +147,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
   // user either have no URL stored or have url stored but they don't own it
   // we will return 403 at this point, they don't own that URL then
-  res.status(403).send("Forbidden: user does not own the URL");
+  res.status(403).send("<h3>Forbidden: user does not own the URL</h3>");
   return;
 });
 
@@ -157,13 +157,13 @@ app.post("/urls/:id", (req, res) => {
 
   // if id does not exist
   if (urlDatabase[req.params.id] === undefined) {
-    res.status(404).send("This shortenURL does not exist in urlDatabase");
+    res.status(404).send("<h3>This shortenURL does not exist in urlDatabase</h3>");
     return;
   }
   
   // if user is not logged in
   if (!loggedInUserId) {
-    res.status(400).send("Bad request: user must login to edit");
+    res.status(400).send("<h3>Bad request: user must login to edit</h3>");
     return;
   }
 
@@ -174,7 +174,7 @@ app.post("/urls/:id", (req, res) => {
     return;
   }
 
-  res.status(403).send('Forbidden: user do not own this shortendURL');
+  res.status(403).send("<h3>Forbidden: user do not own this shortendURL</h3>");
 });
 
 app.post("/login", (req, res) => {
@@ -184,7 +184,7 @@ app.post("/login", (req, res) => {
   
   // if email or password is empty send back a statusCode 400
   if (userEmail.length === 0 || userPassword.length === 0) {
-    res.status(400).send('Bad request, both email and password are required to login');
+    res.status(400).send("<h3>Bad request, both email and password are required to login</h3>");
     return;
   }
   // if email entered in login is in users database
@@ -199,7 +199,7 @@ app.post("/login", (req, res) => {
     }
   }
   // if email is not in database or password does not match the one in database
-  res.status(403).send('Forbidden: Email not found in the database, or incorrect password.');
+  res.status(403).send("<h3>Forbidden: Email not found in the database, or incorrect password.</h3>");
 });
 
 app.post("/logout", (req, res) => {
@@ -217,14 +217,14 @@ app.post("/register", (req, res) => {
 
   // if email or password is empty send back a statusCode 400
   if (userEmail.length === 0 || userPassword.length === 0) {
-    res.status(400).send('Bad Request: Please provide both email and password.');
+    res.status(400).send("<h3>Bad Request: Please provide both email and password.</h3>");
     return;
   }
 
   // check users object whether the email has been resgistered, if truthy
   if (getUserByEmail(users, userEmail)) {
     // if function returns a truthy value, email has already been registered
-    res.status(400).send(`This email has already been registered. Please use a different email`);
+    res.status(400).send("<h3>This email has already been registered. Please use a different email</h3>");
     return;
   }
 
@@ -250,7 +250,7 @@ app.get("/urls/:id", (req, res) => {
   // shortenURLuserOwn holds the shortendURL in urlDatabase that the userId owns
   // null = they don't own any URLS, no null = they own some but we'll check if they own :id
   if (shortendURLuserOwn === null || shortendURLuserOwn[req.params.id] === undefined) {
-    res.status(401).send("unauthorized access: user do not own this URL");
+    res.status(401).send("<h3>unauthorized access: user do not own this URL</h3>");
     return;
   }
 
@@ -274,8 +274,8 @@ app.get("/u/:id", (req, res) => {
 
   if (!doesIdExist) {
     // Implement a relevant HTML error message
-    const errorHtmlMessage = '<html><body><h1>Error, the shortenedURL does not exist in our dataBase</h1></body></html>';
-    res.send(errorHtmlMessage);
+    const errorHtmlMessage = "<h3>Error, the shortenedURL does not exist in our dataBase</h3>";
+    res.status(404).send(errorHtmlMessage);
     return;
   }
 
