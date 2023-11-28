@@ -194,8 +194,8 @@ app.post("/login", (req, res) => {
   // if email entered in login is in users database
   if (getUserByEmail(users, userEmail)) {
     const id = getUserByEmail(users, userEmail);
+    
     // check whether password in users obj match with the one user entered to login
-    // bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword)
     if (bcrypt.compareSync(userPassword, users[id].password)) {
       req.session.user_id = id;
       res.redirect("/urls");
