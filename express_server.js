@@ -134,18 +134,18 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const loggedInUserId = req.session.user_id;
   const id = req.params.id;
-  // should return a relevant error message if id does not exist
-  if (!urlDatabase[id]) {
-    res.status(404).send("<pre>Not Found: url entered is not in urlDatabase</pre>");
-    return;
-  }
-  // should return a relevant error message if the user is not logged in
+  const urlsUserOwn = urlsForUser(urlDatabase, loggedInUserId);
+
+  // user is not logged in
   if (!loggedInUserId) {
     res.status(400).send("<pre>Bad request: must login to delete URL</pre>");
     return;
   }
-  // if user have at least one URL stored in urlDatabase
-  if (urlsForUser(urlDatabase, loggedInUserId)) {
+
+  // user is logged in
+
+  // if urlsUserOwn is truthy, if user doesn't own any, it returns null
+  if (urlsUserOwn) {
     // check if the shortendURL from params have userID that matches with loggedInUser, if it matches, user can delete url
     if (loggedInUserId === urlDatabase[id].userID) {
       delete urlDatabase[id];
@@ -154,9 +154,7 @@ app.post("/urls/:id/delete", (req, res) => {
     }
   }
   // user either have no URL stored or have url stored but they don't own it
-  // we will return 403 at this point, they don't own that URL then
   res.status(403).send("<pre>Forbidden: user does not own the URL</pre>");
-  return;
 });
 
 // post request to change the longURL in urlDatabase
