@@ -162,26 +162,24 @@ app.post("/urls/:id/delete", (req, res) => {
 // post request to change the longURL in urlDatabase
 app.post("/urls/:id", (req, res) => {
   const loggedInUserId = req.session.user_id;
+  const shortendURL = req.params.id;
+  const newLongURL = req.body.longURL;
 
-  // if id does not exist
-  if (urlDatabase[req.params.id] === undefined) {
-    res.status(404).send("<pre>This shortenURL does not exist in urlDatabase</pre>");
-    return;
-  }
-  
   // if user is not logged in
   if (!loggedInUserId) {
     res.status(400).send("<pre>Bad request: user must login to edit</pre>");
     return;
   }
 
-  if (urlDatabase[req.params.id].userID === loggedInUserId) {
+  // user is logged in
+  // if user own the shortenURL
+  if (urlDatabase[shortendURL].userID === loggedInUserId) {
     // update the shortURL value from old longURL to the new longURL user submitted through edit
-    urlDatabase[req.params.id].longURL = req.body.longURL;
+    urlDatabase[shortendURL].longURL = newLongURL;
     res.redirect("/urls");
     return;
   }
-
+  // user do not own the shorten URL
   res.status(403).send("<pre>Forbidden: user do not own this shortendURL</pre>");
 });
 
