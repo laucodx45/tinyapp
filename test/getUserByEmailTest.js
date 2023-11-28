@@ -22,9 +22,9 @@ describe('# getUserByEmail', function() {
     assert.strictEqual(user, expectedUserID);
   });
 
-  it("should return undefined if the input email is not found in any user object", () => {
+  it("should return null if the input email is not found in any user object", () => {
     const user = getUserByEmail(testUsers, "user444@gmail.com");
-    const expectedUserID = undefined;
+    const expectedUserID = null;
 
     assert.strictEqual(user, expectedUserID);
   });

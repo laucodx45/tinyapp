@@ -26,7 +26,7 @@ const getUserByEmail = (database, email) => {
       return database[user].id;
     }
   }
-  return undefined;
+  return null;
 };
 
 // urlsForUser(id) which returns the URLs where the userID is equal to the id of the currently logged-in user
