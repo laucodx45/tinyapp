@@ -39,7 +39,7 @@ const users = {};
 // ///////////////////////////////////////////////////////////////////////////
 // ///////////////////////////////////////////////////////////////////////////
 
-// get route handler for /
+// GET route handler for /
 app.get("/", (req, res) => {
   const loggedInUserId = req.session.user_id;
 
@@ -52,12 +52,9 @@ app.get("/", (req, res) => {
   res.redirect("/urls");
 });
 
-// route handler for /urls
 app.get("/urls", (req, res) => {
-  // find randomId that can be used to access data in users Obj
   const loggedInUserId = req.session.user_id;
   
-  // if user is not logged in
   if (!loggedInUserId) {
     res.redirect("/login");
     return;
@@ -75,7 +72,6 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const loggedInUserId = req.session.user_id;
 
-  // If the user is not logged in, redirect to GET /login
   if (!loggedInUserId) {
     res.redirect("/login");
     return;
@@ -88,7 +84,6 @@ app.get("/urls/new", (req, res) => {
 app.get("/register", (req, res) => {
   const loggedInUserId = req.session.user_id;
 
-  // if user is logged in, GET /register should redirect to GET /urls
   if (loggedInUserId) {
     res.redirect("/urls");
     return;
@@ -101,7 +96,6 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const loggedInUserId = req.session.user_id;
 
-  // if user is logged in, GET /login should redirect to GET /urls
   if (loggedInUserId) {
     res.redirect("/urls");
     return;
@@ -115,7 +109,6 @@ app.post("/urls", (req, res) => {
   const loggedInUserId = req.session.user_id;
   const longURL = req.body.longURL;
 
-  // if user is not logged in, POST /urls should respond with an HTML message
   if (!loggedInUserId) {
     const htmlMessage = "<pre>Cannot shorten URL, user must login to use this feature</pre>";
     res.status(400).send(htmlMessage);
@@ -125,7 +118,6 @@ app.post("/urls", (req, res) => {
   const shortenedURL = generateRandomString();
 
   // create a new entry in the urlDatabase with the shortenedURL as the key
-  // pair key with longURL, req.body.longURL fetch the longURL user entered
   urlDatabase[shortenedURL] = { userID: loggedInUserId, longURL: longURL};
   res.redirect(`/urls/${shortenedURL}`);
 });
@@ -136,7 +128,6 @@ app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   const urlsUserOwn = urlsForUser(urlDatabase, loggedInUserId);
 
-  // user is not logged in
   if (!loggedInUserId) {
     res.status(400).send("<pre>Bad request: must login to delete URL</pre>");
     return;
@@ -146,7 +137,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
   // if urlsUserOwn is truthy, if user doesn't own any, it returns null
   if (urlsUserOwn) {
-    // check if the shortendURL from params have userID that matches with loggedInUser, if it matches, user can delete url
+    // check if the shortendURL from params have userID that matches with loggedInUser
     if (loggedInUserId === urlDatabase[id].userID) {
       delete urlDatabase[id];
       res.redirect("/urls");
@@ -163,7 +154,6 @@ app.post("/urls/:id", (req, res) => {
   const shortendURL = req.params.id;
   const newLongURL = req.body.longURL;
 
-  // if user is not logged in
   if (!loggedInUserId) {
     res.status(400).send("<pre>Bad request: user must login to edit</pre>");
     return;
@@ -218,7 +208,7 @@ app.post("/register", (req, res) => {
   const userPassword = req.body.password;
   const hashedPassword = bcrypt.hashSync(userPassword, 10);
 
-  // if email or password is empty send back a statusCode 400
+  // if email or password is empty
   if (!userEmail.length || !userPassword) {
     res.status(400).send("<pre>Bad Request: Please provide both email and password.</pre>");
     return;
@@ -247,7 +237,6 @@ app.get("/urls/:id", (req, res) => {
   const shortenURL = req.params.id;
   const loggedInUserId = req.session.user_id;
 
-  // if user is not logged in
   if (!loggedInUserId) {
     res.status(401).send("<pre>Unauthorized: user must login first to view this page</pre>");
     return;
@@ -261,9 +250,8 @@ app.get("/urls/:id", (req, res) => {
   
   const shortendURLuserOwn = urlsForUser(urlDatabase, loggedInUserId);
 
-  // shortenURLuserOwn holds the shortendURL in urlDatabase that the userId owns
-  // null = they don't own any URLS, no null = they own some but we'll check if they own :id
-  if (shortendURLuserOwn === null || shortendURLuserOwn[shortenURL] === undefined) {
+  // if user do not own shortURL, 401, if they own, check if they own this specific shortenURL
+  if (!shortendURLuserOwn || !shortendURLuserOwn[shortenURL]) {
     res.status(401).send("<pre>unauthorized access: user do not own this URL</pre>");
     return;
   }
@@ -277,19 +265,14 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// route handler for /u/:id, when the shortenedURL is entered into browser, it redirects user to the longURL
 app.get("/u/:id", (req, res) => {
   const shortenedURL = req.params.id;
 
-  // if the id does not exist at GET /u/:id
-
-  // have to go into urlDatabase to check if the shortendURL exist
+  // check if the shortendURL exist
   const doesIdExist = urlDatabase[shortenedURL];
 
   if (!doesIdExist) {
-    // Implement a relevant HTML error message
-    const errorHtmlMessage = "<pre>Error, the shortenedURL does not exist in our dataBase</pre>";
-    res.status(404).send(errorHtmlMessage);
+    res.status(404).send("<pre>Error, the shortenedURL does not exist in our dataBase</pre>");
     return;
   }
 
