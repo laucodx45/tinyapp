@@ -120,7 +120,7 @@ app.post("/urls", (req, res) => {
   const shortenedURL = generateRandomString();
 
   // create a new entry in the urlDatabase with the shortenedURL as the key
-  urlDatabase[shortenedURL] = { userID: loggedInUserId, longURL: longURL};
+  urlDatabase[shortenedURL] = { userID: loggedInUserId, longURL: longURL, numberOfVisits: 0};
   res.redirect(`/urls/${shortenedURL}`);
 });
 
@@ -279,6 +279,10 @@ app.get("/u/:id", (req, res) => {
   }
 
   const longURL = urlDatabase[shortenedURL].longURL;
+  // new feature, number of visit
+  urlDatabase[shortenedURL].numberOfVisits += 1;
+  // test
+  console.log(urlDatabase[shortenedURL].numberOfVisits);
   res.redirect(longURL);
 });
 // ///////////////////////////////////////////////////////////////////////////
