@@ -3,6 +3,7 @@ const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
 const {generateRandomString, getUserByEmail, urlsForUser} = require('./functions');
+const methodOverride = require('method-override');
 
 const app = express();
 const PORT = 8080;
@@ -24,6 +25,7 @@ app.use(morgan('dev'));
 
 app.set("view engine", "ejs");
 
+app.use(methodOverride('_method'));
 // ///////////////////////////////////////////////////////////////////////////
 // ///////////////////////////////////////////////////////////////////////////
 // Database
@@ -123,7 +125,7 @@ app.post("/urls", (req, res) => {
 });
 
 // POST request to delete shortURL
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id", (req, res) => {
   const loggedInUserId = req.session.user_id;
   const id = req.params.id;
   const urlsUserOwn = urlsForUser(urlDatabase, loggedInUserId);
@@ -149,7 +151,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 // post request to change the longURL in urlDatabase
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const loggedInUserId = req.session.user_id;
   const shortendURL = req.params.id;
   const newLongURL = req.body.longURL;
