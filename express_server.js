@@ -118,9 +118,17 @@ app.post("/urls", (req, res) => {
   }
 
   const shortenedURL = generateRandomString();
-
+  /*
+  timeStampObj {
+    random_id: Date();
+  }
+  */
   // create a new entry in the urlDatabase with the shortenedURL as the key
-  urlDatabase[shortenedURL] = { userID: loggedInUserId, longURL: longURL, numberOfVisits: 0};
+  urlDatabase[shortenedURL] = {
+    userID: loggedInUserId, longURL: longURL, numberOfVisits: 0, totalUniqueVisitors: {
+      uniqueVisitorCount: 0
+    }, timeStamp: []
+  };
   res.redirect(`/urls/${shortenedURL}`);
 });
 
@@ -261,7 +269,8 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: shortenURL,
     longURL: shortendURLuserOwn[shortenURL].longURL,
-    user: users[loggedInUserId]
+    user: users[loggedInUserId],
+    urls: urlsForUser(urlDatabase, loggedInUserId)
   };
 
   res.render("urls_show", templateVars);
@@ -277,12 +286,22 @@ app.get("/u/:id", (req, res) => {
     res.status(404).send("<pre>Error, the shortenedURL does not exist in our dataBase</pre>");
     return;
   }
-
+  
   const longURL = urlDatabase[shortenedURL].longURL;
-  // new feature, number of visit
+  const totalUniqueVisitors = urlDatabase[shortenedURL].totalUniqueVisitors;
+  const visitorCookie = req.session.user_id;
+
+  // check if visitor has visited this link, if not, create a key with their cookie, and assign a random string as value
+  // if they don't already exist in totalUniqueVisitors object, uniqueVisitorCount ++
+  if (!totalUniqueVisitors[visitorCookie]) {
+    totalUniqueVisitors[visitorCookie] = generateRandomString();
+    totalUniqueVisitors.uniqueVisitorCount += 1;
+  }
+  
+  // everytime somone access the longURL via this link numberOfVisits ++
   urlDatabase[shortenedURL].numberOfVisits += 1;
-  // test
-  console.log(urlDatabase[shortenedURL].numberOfVisits);
+  urlDatabase[shortenedURL].timeStamp.push([Date(), generateRandomString()]);
+
   res.redirect(longURL);
 });
 // ///////////////////////////////////////////////////////////////////////////

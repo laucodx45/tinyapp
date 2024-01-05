@@ -34,6 +34,24 @@
       </div>
       <div class="card-footer text-muted"></div>
     </div>
+    <div class="card text-center">
+      <% for (let id in urls) { %>
+        <% if (urls[id].timeStamp.length !== 0) { %>
+          <table>
+            <tr>
+              <th scope="col">Timestamp</th>
+              <th scope="col">Visited By</th>
+            </tr>
+            <% for (const element of urls[id].timeStamp) { %>
+              <tr>
+                <th><%=element[0] %></th>
+                <th>visitor_<%=element[1] %></th>
+              </tr>
+            <% } %>
+          </table>
+          <% } %>
+      <% } %>
+    </div>
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
